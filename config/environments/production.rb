@@ -61,6 +61,7 @@ SampleApp::Application.configure do
   # Precompile additional assets.
   # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
   # config.assets.precompile += %w( search.js )
+  config.assets.precompile += %w( application.css )
   config.assets.precompile += %w( custom.css )
 
   # Ignore bad email addresses and do not raise email delivery errors.
