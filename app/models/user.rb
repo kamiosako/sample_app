@@ -5,13 +5,23 @@ class User < ActiveRecord::Base
   has_many :reverse_relationships, foreign_key: "followed_id",
                                    class_name:  "Relationship",
                                    dependent:   :destroy
-  has_many :followers, through: :reverse_relationships, source: :follower 
+  has_many :followers, through: :reverse_relationships, source: :follower
+
+ #messages
+  has_many :sent_messages,
+  :class_name => 'Message',
+  :primary_key=>'user_id',
+  :foreign_key => 'sender_id',
+  :order => "messages.created_at DESC",
+  :conditions => ["messages.sender_deleted = ?", false]
+
   has_many :received_messages,
    :class_name  => 'Message',
    :primary_key => 'user_id',
    :foreign_key => 'recepient_id',
    :order       => "messages.created_at DESC",
    :conditions   => ["messages.recepient_deleted = ?", false]
+ #messages end
 
   def unread_messages?
    unread_message_count > 0 ? true : false

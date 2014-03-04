@@ -11,7 +11,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140303053543) do
+ActiveRecord::Schema.define(version: 20140304064930) do
+
+  create_table "mailboxes", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "messages", force: true do |t|
     t.string   "sender_id",                           null: false
