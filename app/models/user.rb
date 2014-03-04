@@ -7,18 +7,19 @@ class User < ActiveRecord::Base
                                    dependent:   :destroy
   has_many :followers, through: :reverse_relationships, source: :follower 
   has_many :received_messages,
-   :class_name  => 'Message'
-   :primary_key => 'user_id'
-   :foreign_key => 'recepient_id'
-   :order       => "messages.created_at DESC"
-   :conditons   => ["messages.recepient_deleted = ?", false]
+   :class_name  => 'Message',
+   :primary_key => 'user_id',
+   :foreign_key => 'recepient_id',
+   :order       => "messages.created_at DESC",
+   :conditions   => ["messages.recepient_deleted = ?", false]
 
   def unread_messages?
    unread_message_count > 0 ? true : false
+  end
 
   # Returns the number of unread messages for this user
    def unread_message_count
-   eval 'messageas.count(:conditons => ["recepient_id = ? AND read_at IS NULL", self.user_id])'
+   eval 'messageas.count(:conditions => ["recepient_id = ? AND read_at IS NULL", self.user_id])'
    end
 
   before_save { self.email = email.downcase }
@@ -63,4 +64,3 @@ class User < ActiveRecord::Base
       self.remember_token = User.encrypt(User.new_remember_token)
     end
 end
-

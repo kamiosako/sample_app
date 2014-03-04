@@ -11,7 +11,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140205060752) do
+ActiveRecord::Schema.define(version: 20140303053543) do
+
+  create_table "messages", force: true do |t|
+    t.string   "sender_id",                           null: false
+    t.string   "recepient_id"
+    t.boolean  "sender_deleted",    default: false
+    t.boolean  "recepient_deleted", default: false
+    t.string   "subject",                             null: false
+    t.text     "body"
+    t.datetime "read_at"
+    t.string   "container",         default: "draft"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "messege_types", force: true do |t|
+    t.string   "name",        null: false
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "microposts", force: true do |t|
     t.string   "content"
