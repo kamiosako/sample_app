@@ -1,14 +1,20 @@
 class CreateMessages < ActiveRecord::Migration
   def change
     create_table :messages do |t|
-     t.string    :sender_id,      :null => false
-     t.string    :recepient_id
-     t.boolean   :sender_deleted, :recepient_deleted, :default => 0
-     t.string    :subject,        :null => false 
-     t.text      :body
-     t.datetime  :read_at
-     t.string    :container,      :default => "draft"
-     t.timestamps
+      t.string      :subject
+      t.text        :body
+      t.integer     :user_id
+      t.string      :ancestry
+      t.string      :recipient_ids
+      t.datetime    :sent_at
+      t.datetime    :received_at
+      t.datetime    :read_at
+      t.datetime    :trashed_at
+      t.datetime    :deleted_at
+      t.boolean     :editable, default: true
+      t.timestamps
     end
+    add_index :messages, :user_id
+    add_index :messages, :ancestry
   end
 end

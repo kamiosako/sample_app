@@ -1,43 +1,143 @@
+require 'message_sender'
 class Message < ActiveRecord::Base
- attr_accessible :subject, :body, :sender_id, :recepient_id, :read_at, :sender_deleted, :recepient_deleted
- validates_presence_of :subject, :message => "Please enter message title"
+ # has_ancestry
 
- belongs_to :sender,
-  :class_name  => 'User',
-  :primary_key => 'user_id',
-  :foreign_key => 'sender_id'
- belongs_to :recepient,
-  :class_name  => 'User',
-  :primary_key => 'user_id',
-  :foreign_key => 'recepient_id'
+  attr_accessor :draft
+  serialize :recipient_ids, Array
 
+  belongs_to :user
 
-# marks a message as deleted by either the sender or the recepient, which ever the user taht was passed is.
- # When both sender and recepient marks it deleted, it is destroyed.
+  validates :body, :user_id, presence: true
+  validate :lock_down_attributes, on: :update
 
- def mark_message_deleted(id,user_id)
- self.sender_deleted = true if self.sender_id == user_id and self.id=id
- self.recepient_deleted = true if self.recepient_is == user_id and self.id=id
- self.sender_deleted && self.recepient_deleted ? self.destroy : save!
- end
+  scope :ordered,      -> { order('created_at asc') }
+  scope :active,       -> { not_trashed.not_deleted }
 
+  scope :draft,        -> { where('sent_at is NULL') }
+  scope :not_draft,    -> { where('sent_at is not NULL')  }
 
-# Read message and if it is read by recepient then mark it is read
+  scope :sent,         -> { where('sent_at is not NULL') }
+  scope :unsent,       -> { where('sent_at is NULL')  }
 
- def self.readingmessage(id, reader)
- message = find(id, :conditions => ["sender_id = ? OR recepient_id = ?", reader, reader])
- if message.read_at.nil? && (message.recepient.user_id==reader)
- message.save!
- end
- message
- end
+  scope :received,     -> { where('received_at is not NULL') }
+  scope :not_received, -> { where('received_at is NULL') }
 
+  scope :trashed,      -> { where('trashed_at is not NULL') }
+  scope :not_trashed,  -> { where('trashed_at is NULL') }
 
-#Based on if a message has been reaf by it's recepient returns trur or false.
+  scope :deleted,      -> { where('deleted_at is not NULL') }
+  scope :not_deleted,  -> { where('deleted_at is NULL') }
 
- def read?
- self.read_at.nil? ? false : true
- end
+  scope :by_user, lambda { |user| where(user_id: user.id) }
+  scope :inbox,   lambda { |user| by_user(user).active.received }
+  scope :outbox,  lambda { |user| by_user(user).active.sent }
+  scope :drafts,  lambda { |user| by_user(user).active.draft.not_received }
+  scope :trash,   lambda { |user| by_user(user).trashed.not_deleted }
 
+  scope :read,    lambda { |user| by_user(user).where('read_at is not NULL').received }
+  scope :unread,  lambda { |user| by_user(user).where('read_at is NULL').received }
+
+  def active?
+    !trashed? && !deleted?
+  end
+
+  def sender= sending_user
+    user = sending_user
+  end
+
+  def sender
+    sent? ? user : parent.user
+  end
+
+  def recipients
+    sent? ? children.collect(&:user) : parent.recipients
+  end
+
+  def recipients= users
+    users.each { |u| recipient_ids << u.id }
+  end
+
+  def recipient_list
+    recipient_ids.reject(&:blank?).map {|id| User.find id}
+  end
+
+  def mailbox
+    case
+    when sent? then :outbox
+    when received? then :inbox
+    when !new_record? && unsent? then :drafts
+    when trashed? then :trash
+    else
+      :compose
+    end
+  end
+
+  def send!
+    lock.synchronize do
+      MessageSender.new(self).run unless draft?
+    end
+  end
+
+  def reply! options={}
+    if parent
+      reply = children.create!(subject: options.fetch(:subject, subject),
+       body: options.fetch(:body, nil),
+       user: user,
+       recipients: [parent.user])
+      reply.send!
+    end
+  end
+
+  def receive!
+    update_attributes(:received_at=> Time.now)
+  end
+
+  def read!
+    update_attributes(:read_at=> Time.now) if !self.read_at.present?
+  end
+
+  def trash!
+    update_attributes(:trashed_at=> Time.now)
+  end
+
+  def delete!
+    update_attributes(:deleted_at=> Time.now)
+  end
+
+  %w[sent received trashed deleted read].each do |act|
+    define_method "#{act}?" do
+      self.send(:"#{act}_at").present?
+    end
+  end
+
+  def unread?
+    !read?
+  end
+
+  def uneditable?
+    !editable?
+  end
+
+  def unsent?
+    !sent?
+  end
+
+  def draft?
+    self.draft == '1'
+  end
+
+  def sent_date
+    sent_at || received_at
+  end
+
+  private
+  def lock_down_attributes
+    return if editable?
+    errors.add(:base, 'Cannot edit') unless deleted_at_changed? || trashed_at_changed? || read_at_changed?
+  end
+
+  def lock
+    @lock ||= Mutex.new
+  end
 end
 

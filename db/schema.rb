@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140304104757) do
+ActiveRecord::Schema.define(version: 20140305032920) do
 
   create_table "conversations", force: true do |t|
     t.string   "subject",    default: ""
@@ -35,7 +35,10 @@ ActiveRecord::Schema.define(version: 20140304104757) do
     t.string   "container",         default: "draft"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "ancestry"
   end
+
+  add_index "messages", ["ancestry"], name: "index_messages_on_ancestry"
 
   create_table "messege_types", force: true do |t|
     t.string   "name",        null: false
