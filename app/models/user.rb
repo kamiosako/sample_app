@@ -7,6 +7,9 @@ class User < ActiveRecord::Base
                                    dependent:   :destroy
   has_many :followers, through: :reverse_relationships, source: :follower
 
+ #mailboxer
+ # acts_as_messageable
+
  #messages
   has_many :sent_messages,
   :class_name => 'Message',
