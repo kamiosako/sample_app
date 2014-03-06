@@ -3,6 +3,8 @@ class Message < ActiveRecord::Base
  attr_accessible :subject, :body, :sender_id, :recepient_id, :read_at, :sender_deleted, :recepient_deleted
  validates_presence_of :subject, :message => "Please enter message title"
 
+ serialize :recipient_ids, Array
+
   belongs_to :sender,
   :class_name => 'User',
   :primary_key => 'id',
@@ -30,5 +32,24 @@ class Message < ActiveRecord::Base
  def read?
  self.read_at.nil? ? false : true
  end
- 
+
+ def self.received_by(user)
+   where(:recepient_id => user.id)
+ end
+
+ def self.sent_by(user)
+   Message.where(:sender_id => user.id)
+ end
+
+ def recepients
+   sent? ? children.collect(&:user) : parent.recepients
+ end
+
+ def recepients= users
+   users.each { |u| recepient_ids << u.id }
+ end
+
+ def sent_date
+   sent_at || received_at
+ end
 end

@@ -4,17 +4,25 @@
 <% else %>
  <table class="table table-hover table-bordered">
   <thead>
-   <th>Subject</th>
    <th>To</th>
-   <th></th>
+   <th>Subject</th>
+   <th>Content</th>
+   <th>Sent at</th>
   </thead>
   <tbody>
    <% @sent_messages.each do |message| %>
     <tr>
-     <td><%=h mesage.subject %></td>
-     <td><%=h message.recepient_list.map{|user| user.full_name}.join(",") %> at <%=h message.sent_at.to_date %></td>
      <td>
-      <%= link_to("Show", message_path(:id=>message)) %>
+        <%=h message.recepient_id %>
+     </td>
+     <td>
+        <%=h message.subject %>
+     </td>
+     <td>
+        <%= link_to("Show", show_messages_path(:id=>message)) %>
+     </td>
+     <td>
+        <%=h message.updated_at %>
      </td>
     </tr>
    <% end %>

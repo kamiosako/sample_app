@@ -15,13 +15,20 @@ class User < ActiveRecord::Base
    :conditions   => ["messages.recepient_deleted = ?", false]
 
   def unread_messages?
-   unread_message_count > 0 ? true : false
+    unread_message_count > 0 ? true : false
   end
 
-  # Returns the number of unread messages for this user
-   def unread_message_count
-   eval 'messageas.count(:conditions => ["recepient_id = ? AND read_at IS NULL", self.id])'
-   end
+  def unread_message_count
+    eval 'messageas.count(:conditions => ["recepient_id = ? AND read_at IS NULL", self.id])'
+  end
+
+  def received_messages
+    Message.received_by(self)
+  end
+
+  def sent_messages
+    Message.sent_by(self)
+  end
 
   before_save { self.email = email.downcase }
   before_create :create_remember_token

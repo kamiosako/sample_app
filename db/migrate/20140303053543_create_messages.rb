@@ -3,7 +3,7 @@ class CreateMessages < ActiveRecord::Migration
     create_table :messages do |t|
       t.string      :subject
       t.text        :body
-      t.integer     :user_id
+      t.integer     :id
       t.string      :ancestry
       t.string      :recipient_ids
       t.datetime    :sent_at
@@ -14,7 +14,7 @@ class CreateMessages < ActiveRecord::Migration
       t.boolean     :editable, default: true
       t.timestamps
     end
-    add_index :messages, :user_id
+    add_index :messages, :id
     add_index :messages, :ancestry
   end
 end
