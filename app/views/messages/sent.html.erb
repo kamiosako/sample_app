@@ -9,7 +9,7 @@
    <th></th>
   </thead>
   <tbody>
-   <% @sent_messages.each do |message| >
+   <% @sent_messages.each do |message| %>
     <tr>
      <td><%=h mesage.subject %></td>
      <td><%=h message.recepient_list.map{|user| user.full_name}.join(",") %> at <%=h message.sent_at.to_date %></td>

@@ -7,7 +7,11 @@ module ApplicationHelper
       base_title
    else
      "#{base_title} | #{page_title}"
-    end
-  end
+   end
+ end
+
+ def message_person(mailbox_name, message)
+   mailbox_name == 'inbox' ? message.sender : message.recipient_list.join(', ')
+ end
 end
 

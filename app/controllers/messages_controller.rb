@@ -1,105 +1,55 @@
 class MessagesController < ApplicationController
-#before_action :message, only: [:show, :update, :destroy]
-  #before_action :can_view_message, only: [:show, :edit, :destroy]
-
-  def index
-    mailbox = Mailbox.new(current_user)
-    @inbox_messages = mailbox.inbox
+ 
+ before_filter :set_user
+ 
+ def index
+  if params[:mailbox] == "sent"
+   @messages = @user.sent_messages
+  elsif params[:mailbox] == "inbox"
+   @messages = @user.received_messages
+  elsif params[:mailbox] == "archieved"
+   @messages = @user.archived_messages
   end
-
-  def sent
-    mailbox = Mailbox.new(current_user)
-    @sent_messages = mailbox.outbox
+ end
+ 
+ def new
+  @message = Message.new
+  if params[:reply_to]
+   @reply_to = User.find_by_id(params[:reply_to])
+  unless @reply_to.nil?
+   @message.recepient_id = @reply_to.id
   end
-
-  def new
-    @message = current_user.messages.new
-  end
-
-  def create
-    message_params[:recipient_ids]=message_params[:recipient_ids].select{|r| !r.blank?}
-    @message = Message.new(message_params.merge(:user=> current_user))
-    if @message.save
-      send_message
-    else
-      render :new
-    end
-  end
-
-  def edit
-    redirect_to message unless message.unsent?
-  end
-
-  def update
-    message.update(message_params)
-    send_message
-  end
-
-  def show
-    @message = Message.find(params[:id])
-    @message.read! if @message.received? || @message.unread?
-  end
-
-  def reply
-    @message = Message.find(params[:id])
-    if params[:message][:body]
-      @message.reply! message_params.merge(:user=> current_user)
-      set_flash_message :notice, :replied
-      redirect_to index_messages_path
-    else
-      set_flash_message :alert, :invalid
-      redirect_to :back
-    end
-  end
-
-  def trash
-    @message = Message.find(params[:id])
-    @message.trash!
-    set_flash_message :notice, :trashed
-    redirect_to index_messages_path
-  end
-
-  def destroy
-    message.delete!
-    set_flash_message :notice, :deleted
-    redirect_to mailbox_path(:inbox)
-  end
-
-  def empty_trash
-    Mailbox.new(current_user).empty_trash!
-    set_flash_message :notice, :trash_emptied
-    redirect_to mailbox_path(:inbox)
-  end
-
-  private
-  def message
-    @message ||= Message.find(params[:id])
-  end
-  helper_method :message
-
-  def message_params
-    params[:message]
-  end
-
-  def send_message
-    message.send!
-    notice = message.sent? ? set_flash_message(:notice, :sent) : set_flash_message(:notice, :saved)
-    redirect_to :back, notice: notice
-  end
-
-  def mailbox_name
-    params[:mailbox] || message.mailbox.to_s
-  end
-  helper_method :mailbox_name
-
-  def can_view_message
-    unless mine?
-      set_flash_message :notice, :unauthorised
-      redirect_to mailbox_path(:inbox)
-    end
-  end
-
-  def mine?
-    message.user == current_user
-  end
+ end
+ end
+ 
+ def create
+ @message = Message.new(params[:message])
+ @message.sender_id = @user.id
+ if @message.save
+ flash[:notice] = "Message has been sent"
+ redirect_to sent_messages_path(current_user, :mailbox=>:inbox)
+ else
+ render :action => :new
+ end
+ end
+ 
+def show
+ @message = Message.readingmessage(params[:id],@user.id)
+ end
+ 
+ def delete_multiple
+ if params[:delete]
+ params[:delete].each { |id|
+ @message = Message.find(id)
+ @message.mark_message_deleted(@message.id,@user.id) unless @message.nil?
+ }
+ flash[:notice] = "Messages deleted"
+ end
+ redirect_to user_messages_path(@user, @messages)
+ end
+ 
+ private
+ def set_user
+ @user = current_user
+ end
 end

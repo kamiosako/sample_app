@@ -6,25 +6,13 @@ class User < ActiveRecord::Base
                                    class_name:  "Relationship",
                                    dependent:   :destroy
   has_many :followers, through: :reverse_relationships, source: :follower
-
- #mailboxer
- # acts_as_messageable
-
- #messages
-  has_many :sent_messages,
-  :class_name => 'Message',
-  :primary_key=>'user_id',
-  :foreign_key => 'sender_id',
-  :order => "messages.created_at DESC",
-  :conditions => ["messages.sender_deleted = ?", false]
-
+  
   has_many :received_messages,
    :class_name  => 'Message',
-   :primary_key => 'user_id',
+   :primary_key => 'id',
    :foreign_key => 'recepient_id',
    :order       => "messages.created_at DESC",
    :conditions   => ["messages.recepient_deleted = ?", false]
- #messages end
 
   def unread_messages?
    unread_message_count > 0 ? true : false
@@ -32,7 +20,7 @@ class User < ActiveRecord::Base
 
   # Returns the number of unread messages for this user
    def unread_message_count
-   eval 'messageas.count(:conditions => ["recepient_id = ? AND read_at IS NULL", self.user_id])'
+   eval 'messageas.count(:conditions => ["recepient_id = ? AND read_at IS NULL", self.id])'
    end
 
   before_save { self.email = email.downcase }
