@@ -5,32 +5,32 @@ class Message < ActiveRecord::Base
 
  serialize :recipient_ids, Array
 
-  belongs_to :sender,
+ belongs_to :sender,
   :class_name => 'User',
   :primary_key => 'id',
   :foreign_key => 'sender_id'
-  belongs_to :recepient,
+ belongs_to :recepient,
   :class_name => 'User',
   :primary_key => 'id',
   :foreign_key => 'recepient_id'
 
  def mark_message_deleted
- self.sender_deleted = true if self.sender_id == id and self.id=id
- self.recepient_deleted = true if self.recepient_id == id and self.id=id
- self.sender_deleted && self.recepient_deleted ? self.destroy : save!
+   self.sender_deleted = true if self.sender_id == id and self.id=id
+   self.recepient_deleted = true if self.recepient_id == id and self.id=id
+   self.sender_deleted && self.recepient_deleted ? self.destroy : save!
  end
  
  def self.readingmessage(id, reader)
- message = find(id, :conditions => ["sender_id = ? OR recepient_id = ?", reader, reader])
- if message.read_at.nil? && (message.recepient.id==reader)
- message.read_at = Time.now
- message.save!
+   message = find(id, :conditions => ["sender_id = ? OR recepient_id = ?", reader, reader])
+     if message.read_at.nil? && (message.recepient.id==reader)
+       message.read_at = Time.now
+       message.save!
+     end
+   message
  end
- message
- end
- 
+
  def read?
- self.read_at.nil? ? false : true
+   self.read_at.nil? ? false : true
  end
 
  def self.received_by(user)
