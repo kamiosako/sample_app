@@ -15,7 +15,7 @@
      <% @inbox_messages.each do |message| %>
        <tr>
          <td>
-           <%=h sender_id %>
+           <%=h message.sender.name %>
          </td>
          <td>
            <%=h message.subject %>

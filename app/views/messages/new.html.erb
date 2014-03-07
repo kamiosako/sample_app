@@ -8,7 +8,7 @@
   <fieldset>
     <%= f.input :recepient_id, :input_html=> {class: 'recepient'}, label: 'Sent To' %>
     <%= f.input :subject,:label=> false,:placeholder=>'enter title ...' %>
-    <%= f.input :body, :label=> false, :required=> false, :placeholder=> 'Hi, how are you? ...',:input_html => {:rows=>5,:style=>'width:100%'} %>
+    <%= f.input :body, :label=> false, :required=> false, :input_html => {:rows=>5,:style=>'width:100%'} %>
     <%= f.button :submit,'Send Message',:class=>"btn btn-primary" %>
   </fieldset>
 <% end %>

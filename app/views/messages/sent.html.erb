@@ -13,7 +13,7 @@
    <% @sent_messages.each do |message| %>
     <tr>
      <td>
-        <%=h message.recepient_id %>
+        <%=h message.recepient.name %>
      </td>
      <td>
         <%=h message.subject %>

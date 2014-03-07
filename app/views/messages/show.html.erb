@@ -3,7 +3,7 @@
 <%= @message.updated_at %>
 <h4>From</h4>
 <lavel>
-<%= @message.sender_id %>
+<%= @message.sender.name %>
 </label>
 <h4>Subject</h4>
 <label>
@@ -13,11 +13,12 @@
 <label>
   <%= @message.body %>
 </label>
-<h4>Reply</h4>
-  <%= simple_form_for @message, url: reply_messages_path(:id=>@message), method: :post do |f| %>
+<h4>Reply to</h4>
+  <%= simple_form_for(@message) do |f| %>
     <fieldset>
+      <%= f.input :recepient_id, :input_html=> {class: 'recepient', value: "#{@message.sender_id}" }, :label=> false %>
       <%= f.input :subject, :label=> false, :input_html=>{ value: "Re: #{@message.subject}"} %>
-      <%= f.input :body, :label=> false, :required=> false, :placeholder=> 'Reply : Hi, how are you? ...', :input_html => {:rows=>5,:style=>'width:100%', :value=>''} %>   
-      <%= f.submit 'Reply',:class=>"btn btn-primary" %>
+      <%= f.input :body, :label=> false, :required=> false, :input_html => {:rows=>5,:style=>'width:100%', :value=>''} %>   
+      <%= f.button :submit,'Reply to',:class=>"btn btn-primary" %>
     </fieldset>
   <% end %>

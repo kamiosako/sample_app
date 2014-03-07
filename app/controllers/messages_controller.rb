@@ -19,7 +19,7 @@ class MessagesController < ApplicationController
    end
    end
  end
- 
+
  def create
    @message = Message.new(params[:message])
    @message.sender_id = @user.id
@@ -45,6 +45,17 @@ class MessagesController < ApplicationController
      end
    redirect_to user_messages_path(@user, @messages)
  end
+
+ def update
+   @message = Message.new(params[:message])
+   @message.sender_id = @user.id
+   if @message.save
+     flash[:notice] = "Message has been sent"
+     redirect_to index_messages_path(current_user, :mailbox=>:inbox)
+   else
+     render :action => :new
+   end
+ end
  
  private
  def set_user
@@ -55,5 +66,3 @@ class MessagesController < ApplicationController
    params[:message]
  end
 end
-
-
