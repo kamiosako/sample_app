@@ -4,6 +4,8 @@ class Message < ActiveRecord::Base
  validates_presence_of :subject, :message => "Please enter message title"
  validates_presence_of :recepient_id, :message => "Please enter recepient_id"
 
+ default_scope -> { order('created_at DESC') }
+
  belongs_to :sender,
   :class_name => 'User',
   :primary_key => 'id',

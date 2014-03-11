@@ -19,10 +19,10 @@
         <%=h message.subject %>
      </td>
      <td>
-        <%= link_to("Show", show_messages_path(:id=>message)) %>
+        <%= link_to("More", more_messages_path(:id=>message)) %>
      </td>
      <td>
-        <%=h message.updated_at %>
+        <%=h message.updated_at.to_s(:db) %>
      </td>
     </tr>
    <% end %>

@@ -1,18 +1,9 @@
 <%= render 'shared/messages_menu' %>
-<h4>Date</h4>
-<%= @message.updated_at %>
 <h4>From</h4>
 <lavel>
 <%= @message.sender.name %>
 </label>
-<h4>Subject</h4>
-<label>
-  <%= @message.subject %>
-</label>
-<h4>Content</h4>
-<label>
-  <%= @message.body %>
-</label>
+<%= render 'messages/layout' %>
 <h4>Reply to</h4>
   <%= simple_form_for(@message) do |f| %>
     <fieldset>

@@ -15,6 +15,7 @@ SampleApp::Application.routes.draw do
     get 'index',   :to=>'messages#index', :as=>:index
     get 'sent',    :to=>'messages#sent',  :as=>:sent
     get 'show',    :to=>'messages#show',  :as=>:show
+    get 'more',    :to=>'messages#more',  :as=>:more
     post 'reply',  :to=>'messages#reply', :as=>:reply
     post 'trash',  :to=>'messages#trash', :as=>:trash
    end

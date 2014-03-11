@@ -35,6 +35,10 @@ class MessagesController < ApplicationController
    @message = Message.readingmessage(params[:id],@user.id)
  end
  
+ def more
+   @message = Message.readingmessage(params[:id],@user.id)
+ end
+
  def delete_multiple
    if params[:delete]
      params[:delete].each { |id|

@@ -23,7 +23,7 @@
          <td>
            <%= link_to("Show",show_messages_path(:id=>message)) %>
          </td>
-         <td><%=h message.updated_at %></td>
+         <td><%=h message.updated_at.to_s(:db) %></td>
        </tr>
      <% end %>
     </tbody>

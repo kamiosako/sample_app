@@ -1,0 +1,10 @@
+<h4>Date</h4>
+<%= @message.updated_at.to_s(:db) %>
+<h4>Subject</h4>
+<label>
+  <%= @message.subject %>
+</label>
+<h4>Content</h4>
+<label>
+  <%= @message.body %>
+</label>
