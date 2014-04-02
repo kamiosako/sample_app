@@ -7,7 +7,7 @@
 <h4>Reply to</h4>
   <%= simple_form_for(@message) do |f| %>
     <fieldset>
-      <%= f.input :recepient_id, :input_html=> {class: 'recepient', value: "#{@message.sender_id}" }, :label=> false %>
+      <%= f.input :recepient_id, :as=>:hidden, :input_html=> {class: 'recepient', value: "#{@message.sender_id}" }, :label=> false %>
       <%= f.input :subject, :label=> false, :input_html=>{ value: "Re: #{@message.subject}"} %>
       <%= f.input :body, :label=> false, :required=> false, :input_html => {:rows=>5,:style=>'width:100%', :value=>''} %>   
       <%= f.button :submit,'Reply to',:class=>"btn btn-primary" %>

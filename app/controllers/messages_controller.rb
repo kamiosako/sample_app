@@ -12,16 +12,25 @@ class MessagesController < ApplicationController
 
  def new
    @message = Message.new
-   if params[:reply_to]
-     @reply_to = User.find_by_id(params[:reply_to])
-   unless @reply_to.nil?
-     @message.recepient_id = @reply_to.id
-   end
-   end
  end
 
  def create
    @message = Message.new(params[:message])
+   user = User.find_by(name:params[:name])
+   @message.recepient_id = user.id
+  # if user && user.authenticate(params[:name])
+  #   @message.recepient_id = user.id
+  #   @message.sender_id = @user.id
+  #     if @message.save
+  #       flash[:notice] = "Message has been sent"
+  #       redirect_to index_messages_path(current_user, :mailbox=>:inbox)
+  #     else
+  #       render :action => :new
+  #     end     
+  # else
+  #   flash[:error] = "Invalid recipient name"
+  #   render 'new'
+  # end
    @message.sender_id = @user.id
    if @message.save
      flash[:notice] = "Message has been sent"

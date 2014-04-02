@@ -2,7 +2,6 @@ require 'message_sender'
 class Message < ActiveRecord::Base
  attr_accessible :subject, :body, :sender_id, :recepient_id, :read_at, :sender_deleted, :recepient_deleted
  validates_presence_of :subject, :message => "Please enter message title"
- validates_presence_of :recepient_id, :message => "Please enter recepient_id"
 
  default_scope -> { order('created_at DESC') }
 
@@ -15,23 +14,13 @@ class Message < ActiveRecord::Base
   :primary_key => 'id',
   :foreign_key => 'recepient_id'
 
- def mark_message_deleted
-   self.sender_deleted = true if self.sender_id == id and self.id=id
-   self.recepient_deleted = true if self.recepient_id == id and self.id=id
-   self.sender_deleted && self.recepient_deleted ? self.destroy : save!
- end
- 
  def self.readingmessage(id, reader)
    message = find(id, :conditions => ["sender_id = ? OR recepient_id = ?", reader, reader])
-     if message.read_at.nil? && (message.recepient.id==reader)
-       message.read_at = Time.now
-       message.save!
-     end
+   if message.read_at.nil? && (message.recepient.id==reader)
+     message.read_at = Time.now
+     message.save!
+   end
    message
- end
-
- def read?
-   self.read_at.nil? ? false : true
  end
 
  def self.received_by(user)
@@ -40,14 +29,6 @@ class Message < ActiveRecord::Base
 
  def self.sent_by(user)
    Message.where(:sender_id => user.id)
- end
-
- def recepients
-   sent? ? children.collect(&:user) : parent.recepients
- end
-
- def recepients= users
-   users.each { |u| recepient_ids << u.id }
  end
 
  def sent_date
