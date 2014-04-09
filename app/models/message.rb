@@ -1,4 +1,3 @@
-require 'message_sender'
 class Message < ActiveRecord::Base
  attr_accessible :subject, :body, :sender_id, :recepient_id, :read_at, :sender_deleted, :recepient_deleted
  validates_presence_of :subject, :message => "Please enter message title"
