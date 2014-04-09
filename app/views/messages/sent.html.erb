@@ -19,7 +19,8 @@
         <%=h message.subject %>
      </td>
      <td>
-        <%= link_to("More", more_messages_path(:id=>message)) %>
+        <%=h truncate(message.body, length:20) %>
+        <%= link_to("More", more_messages_path(:id=>message))if message.body.size > 20 %>
      </td>
      <td>
         <%=h message.updated_at.to_s(:db) %>
